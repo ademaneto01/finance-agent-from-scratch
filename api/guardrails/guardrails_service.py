@@ -1,13 +1,13 @@
-# services/guardrails_service.py
+import re
+
+from config.settings import settings
 from guardrails import Guard
 from guardrails.hub import ProfanityFree
 from openai import OpenAI
-from config.settings import settings
 
 
 def groq_wrapper(*, messages, **kwargs) -> str:
     """Wrapper síncrono para o Guardrails usar o Groq como validador."""
-    from openai import OpenAI
 
     client = OpenAI(
         base_url="https://api.groq.com/openai/v1", api_key=settings.groq_api_key
@@ -39,7 +39,6 @@ class GuardrailsService:
         Valida o ticker extraído com uma regex simples.
         Retorna o ticker ou lança ValueError.
         """
-        import re
 
         if not re.match(r"^[A-Z]{1,5}$", ticker):
             raise ValueError(
