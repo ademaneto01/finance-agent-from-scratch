@@ -21,8 +21,7 @@ def groq_wrapper(*, messages, **kwargs) -> str:
 
 class GuardrailsService:
     def __init__(self):
-        # Guard para validar a query de entrada do usuário
-        self.input_guard = Guard().use_many(
+        self.input_guard = Guard().use(
             ProfanityFree(on_fail="exception"),
         )
 

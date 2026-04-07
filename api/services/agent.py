@@ -22,7 +22,7 @@ from models.agent import (
 
 from services.search import SearchService
 from services.ticker_extractor import TickerExtractor
-from guardrails.guardrails_service import GuardrailsService
+from validators.guardrails_service import GuardrailsService
 
 
 class AgentService:
