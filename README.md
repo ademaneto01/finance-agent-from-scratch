@@ -26,43 +26,43 @@ Este projeto representa um **sistema de análise financeira de próxima geraçã
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      FASTAPI APPLICATION                     │
+│                      FASTAPI APPLICATION                    │
 ├─────────────────────────────────────────────────────────────┤
-│                                                               │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │   ROUTERS    │  │   ROUTERS    │  │   ROUTERS    │      │
-│  │              │  │              │  │              │      │
-│  │ • /agent     │  │ /search      │  │ /ingestion   │      │
-│  │ • Analysis   │  │ • RAG Search │  │ • EDGAR      │      │
-│  │ • Recommend. │  │ • Similarity │  │ • Yahoo      │      │
-│  └──────────────┘  └──────────────┘  └──────────────┘      │
-│         │                  │                  │              │
-│         └──────────────────┼──────────────────┘              │
-│                            │                                 │
+│                                                             │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
+│  │   ROUTERS    │  │   ROUTERS    │  │   ROUTERS    │       │
+│  │              │  │              │  │              │       │
+│  │ • /agent     │  │ /search      │  │ /ingestion   │       │
+│  │ • Analysis   │  │ • RAG Search │  │ • EDGAR      │       │
+│  │ • Recommend. │  │ • Similarity │  │ • Yahoo      │       │
+│  └──────────────┘  └──────────────┘  └──────────────┘       │
+│         │                  │                  │             │
+│         └──────────────────┼──────────────────┘             │
+│                            │                                │
 │         ┌──────────────────▼──────────────────┐             │
 │         │         SERVICES LAYER              │             │
-│         ├──────────────────────────────────────┤            │
-│         │  AgentService  │  SearchService     │            │
-│         │  RAGService    │  EmbeddingsService │            │
-│         │  TickerExtract │  GuardrailsService │            │
-│         └──────────────────────────────────────┘            │
-│                            │                                 │
+│         ├─────────────────────────────────────┤             │
+│         │  AgentService  │  SearchService     │             │
+│         │  RAGService    │  EmbeddingsService │             │
+│         │  TickerExtract │  GuardrailsService │             │
+│         └─────────────────────────────────────┘             │
+│                            │                                │
 │         ┌──────────────────▼──────────────────┐             │
 │         │     DATA INGESTION PIPELINE         │             │
-│         ├──────────────────────────────────────┤            │
-│         │  EDGAR Client    │  Yahoo Client    │            │
-│         │  Semantic Chunker │Simple Chunker   │            │
-│         └──────────────────────────────────────┘            │
-│                            │                                 │
+│         ├─────────────────────────────────────┤             │
+│         │  EDGAR Client    │  Yahoo Client    │             │
+│         │  Semantic Chunker │Simple Chunker   │             │
+│         └─────────────────────────────────────┘             │
+│                            │                                │
 │         ┌──────────────────▼──────────────────┐             │
 │         │   EXTERNAL SERVICES & VECTORS DB    │             │
-│         ├──────────────────────────────────────┤            │
-│         │  Groq LLM      │  Qdrant Vector DB │            │
-│         │  EDGAR API     │  Embeddings Model │            │
-│         │  Yahoo Finance │  Multi-Vector     │            │
-│         │  SEC Filings   │  (Dense/Sparse)  │            │
-│         └──────────────────────────────────────┘            │
-│                                                               │
+│         ├─────────────────────────────────────┤             │
+│         │  Groq LLM      │  Qdrant Vector DB  │             │
+│         │  EDGAR API     │  Embeddings Model  │             │
+│         │  Yahoo Finance │  Multi-Vector      │             │
+│         │  SEC Filings   │  (Dense/Sparse)    │             │
+│         └─────────────────────────────────────┘             │
+│                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
