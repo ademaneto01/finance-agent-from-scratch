@@ -22,7 +22,7 @@ from models.agent import (
 
 from services.search import SearchService
 from services.ticker_extractor import TickerExtractor
-from validators.guardrails_service import GuardrailsService
+# from validators.guardrails_service import GuardrailsService
 
 
 class AgentService:
@@ -31,7 +31,7 @@ class AgentService:
         client = AsyncGroq(api_key=settings.groq_api_key)
         self.client = instructor.from_groq(client, model=instructor.Mode.JSON)
         self.ticker_extractor = TickerExtractor()
-        self.guardrails = GuardrailsService()
+        # self.guardrails = GuardrailsService()
 
     def _run_queries(self, queries: list[str], limit: int, filter: dict = None):
         all_results = []
@@ -70,17 +70,19 @@ class AgentService:
 
     async def analyze(self, query: str, limit: int = 3):
 
-        try:
-            validated_query = self.guardrails.validate_query(query)
-        except Exception as e:
-            raise ValueError(f"Query rejeitada pelo Guardrails: {e}")
+        # try:
+        #     validated_query = self.guardrails.validate_query(query)
+        # except Exception as e:
+        #     raise ValueError(f"Query rejeitada pelo Guardrails: {e}")
+
+        # ticker = self.ticker_extractor.extract_ticker(validated_query)
+
+        # if not ticker:
+        #     raise ValueError("Could not extract a valid ticker symbol from the query")
+
+        # ticker = self.guardrails.validate_ticker(ticker)
 
         ticker = self.ticker_extractor.extract_ticker(validated_query)
-
-        if not ticker:
-            raise ValueError("Could not extract a valid ticker symbol from the query")
-
-        ticker = self.guardrails.validate_ticker(ticker)
 
         fundamental_task = self._analyze_fundamental(ticker, limit)
         momentum_task = self._analyze_momentum(ticker, limit)

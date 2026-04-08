@@ -1,295 +1,252 @@
-# 🐳 Guia de Uso com Docker
+# Docker Guide
 
-Este guia explica como rodar o projeto Finance Agent usando Docker e Docker Compose.
+This document explains how to run `finance-agent-from-scratch` with Docker and Docker Compose based on the current `Dockerfile` and `docker-compose.yml`.
 
-## 📋 Pré-requisitos
+## Overview
 
-- **Docker**: [Instale aqui](https://docs.docker.com/get-docker/)
-- **Docker Compose**: [Instale aqui](https://docs.docker.com/compose/install/)
-- **Groq API Key**: Obtenha em https://console.groq.com
+The Compose setup includes three services:
 
-## 🚀 Quick Start
+- `qdrant`: local Qdrant vector database
+- `api`: FastAPI application exposed on port `8000`
+- `create-collection`: one-off initialization container used to create the Qdrant collection
 
-### 1. Configurar Variáveis de Ambiente
+Default local endpoints:
+
+- API: `http://localhost:8000`
+- Swagger UI: `http://localhost:8000/docs`
+- Qdrant API: `http://localhost:6333`
+- Qdrant dashboard: `http://localhost:6333/dashboard`
+
+## What the Docker Image Does
+
+The application image is built from `python:3.12-slim` and:
+
+1. Installs system packages required for Python builds
+2. Installs `uv`
+3. Copies `pyproject.toml` and `uv.lock`
+4. Runs `uv sync --frozen --no-dev`
+5. Copies the project source code
+6. Starts the API with:
 
 ```bash
-# Copie o arquivo de exemplo
+uv run uvicorn main:app --app-dir /app/api --host 0.0.0.0 --port 8000
+```
+
+## Prerequisites
+
+- Docker
+- Docker Compose
+- A valid `GROQ_API_KEY`
+
+Optional, depending on your use case:
+
+- `OPENAI_API_KEY`
+- `GUARDRAILS_TOKEN`
+
+## Environment Variables
+
+For Docker usage, start from the Docker-specific template:
+
+```bash
 cp .env.docker .env
-
-# Edite o .env e adicione suas credenciais
-# Você PRECISA adicionar sua chave Groq
-export GROQ_API_KEY=gsk_xxxxxxxxxxxxx
 ```
 
-### 2. Criar a Collection no Qdrant (Primeira vez)
+Then edit `.env` and provide the values you need.
 
-```bash
-# Execute com o profile "init" para rodar o script de criar a collection
-docker-compose --profile init up create-collection
+Example:
 
-# Espere a mensagem de sucesso, depois pressione Ctrl+C
+```env
+QDRANT_API_KEY=qdrant-api-key
+GROQ_API_KEY=gsk_your_key_here
+OPENAI_API_KEY=
+GUARDRAILS_TOKEN=
 ```
 
-**O que acontece:**
-- ✅ Qdrant inicia e fica saudável
-- ✅ Script `create_collection` conecta ao Qdrant
-- ✅ Deleta a collection "financial" (se existir)
-- ✅ Cria uma nova collection com configuração otimizada
+Notes:
 
-### 3. Iniciar a API
+- In Docker Compose, `QDRANT_URL` for the containers is set internally to `http://qdrant:6333`
+- `QDRANT_API_KEY` defaults to `qdrant-api-key` if you do not override it
+- The API will not be useful without `GROQ_API_KEY`
+
+## Quick Start
+
+### 1. Build the containers
 
 ```bash
-# Inicie todos os serviços
-docker-compose up
-
-# Ou em background:
-docker-compose up -d
+docker compose build
 ```
 
-**Serviços que iniciam:**
-- **Qdrant** em `http://localhost:6333`
-- **API** em `http://localhost:8000`
-- **Swagger Docs** em `http://localhost:8000/docs`
+### 2. Initialize the Qdrant collection
 
-### 4. Usar a API
+Run the one-off initialization service the first time you set up the stack, or anytime you want to recreate the collection.
 
 ```bash
-# Testar análise de um ticker
+docker compose --profile init up create-collection
+```
+
+What this does:
+
+- starts `qdrant`
+- waits for it to become healthy
+- runs `python -m api.ingestion.create_collection`
+
+If the collection already exists, the initialization script may recreate it depending on the script logic.
+
+### 3. Start the application stack
+
+```bash
+docker compose up
+```
+
+Or in detached mode:
+
+```bash
+docker compose up -d
+```
+
+### 4. Test the API
+
+Example request:
+
+```bash
 curl -X POST "http://localhost:8000/agent" \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "Apple é um bom investimento?",
+    "query": "Is Apple a good investment?",
     "limit": 3
   }'
-
-# Buscar informações
-curl -X POST "http://localhost:8000/search" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "Receita da Apple em 2023",
-    "limit": 5
-  }'
 ```
 
-## 🔧 Comandos Úteis
+You can also inspect the interactive docs at `http://localhost:8000/docs`.
 
-### Iniciar Serviços
-```bash
-# Iniciar todos os serviços
-docker-compose up
+## Common Commands
 
-# Iniciar em background
-docker-compose up -d
-
-# Iniciar apenas qdrant (útil para testes)
-docker-compose up qdrant
-```
-
-### Ver Logs
-```bash
-# Ver logs de todos os serviços
-docker-compose logs -f
-
-# Ver logs de um serviço específico
-docker-compose logs -f api
-docker-compose logs -f qdrant
-docker-compose logs -f create-collection
-```
-
-### Parar Serviços
-```bash
-# Parar todos os serviços
-docker-compose down
-
-# Parar mantendo volumes (dados persistem)
-docker-compose down
-
-# Parar e remover volumes (limpa tudo)
-docker-compose down -v
-```
-
-### Reconstruir Imagens
-```bash
-# Reconstruir a imagem do projeto
-docker-compose build
-
-# Forçar rebuild sem cache
-docker-compose build --no-cache
-```
-
-### Executar Comandos Dentro do Container
-```bash
-# Executar comando no container api
-docker-compose exec api python -c "print('Hello')"
-
-# Abrir shell interativo
-docker-compose exec api bash
-```
-
-## 🔄 Re-criar a Collection
-
-Se você quiser resetar a collection (deletar e recriar):
+### Start and stop
 
 ```bash
-# Option 1: Usando o profile init
-docker-compose --profile init up create-collection
-
-# Option 2: Manualmente no container
-docker-compose exec api python -m api.ingestion.create_collection
+docker compose up
+docker compose up -d
+docker compose down
+docker compose down -v
 ```
 
-## 🌐 Qdrant Dashboard
-
-Acesse o Qdrant Web UI em: **http://localhost:6333/dashboard**
-
-Aqui você pode:
-- Ver collections
-- Visualizar pontos (vetores)
-- Testar buscas
-- Monitorar performance
-
-## 🔐 Segurança em Produção
-
-### Mudar Chave de API do Qdrant
+### Logs
 
 ```bash
-# Em .env
-QDRANT_API_KEY=sua-chave-secreta-aqui
+docker compose logs -f
+docker compose logs -f api
+docker compose logs -f qdrant
+docker compose --profile init logs create-collection
 ```
 
-### Não Expor Portas Desnecessárias
+### Rebuild
 
-Para produção, modifique o docker-compose.yml:
+```bash
+docker compose build
+docker compose build --no-cache
+```
+
+### Run commands inside the API container
+
+```bash
+docker compose exec api bash
+docker compose exec api python -m api.ingestion.create_collection
+```
+
+### Re-run only the collection initializer
+
+```bash
+docker compose --profile init run --rm create-collection
+```
+
+## Development Behavior
+
+The `api` service mounts the local repository into the container:
 
 ```yaml
-services:
-  qdrant:
-    # Remova ou comente a seção "ports" para não expor
-    # ports:
-    #   - "6333:6333"
-    #   - "6334:6334"
+volumes:
+  - .:/app
+  - /app/.venv
 ```
 
-### Usar .env.local (não incluir no git)
+This has two important effects:
+
+- your local code changes are immediately visible inside the container
+- the container keeps its own virtual environment in `/app/.venv`
+
+If you change dependencies in `pyproject.toml` or `uv.lock`, rebuild the image:
 
 ```bash
-# .gitignore
-.env
-.env.local
+docker compose build
 ```
 
-## 📊 Estrutura de Volumes
+## Persistence
 
-- **qdrant_storage**: Persiste dados do Qdrant entre restarts
-- **-v .:/app**: Monta o código local (hot reload com --reload)
-
-## 🐛 Troubleshooting
-
-### Qdrant não inicia
+Qdrant data is stored in the named volume `qdrant_storage`, so vectors remain available across restarts unless you remove volumes with:
 
 ```bash
-# Verificar logs
-docker-compose logs qdrant
-
-# Resetar volumes
-docker-compose down -v
-docker-compose up
+docker compose down -v
 ```
 
-### API não consegue conectar ao Qdrant
+## Troubleshooting
+
+### Qdrant does not become healthy
 
 ```bash
-# Verificar se Qdrant está saudável
-docker-compose ps
-
-# Ver logs da API
-docker-compose logs api
+docker compose logs qdrant
+docker compose down -v
+docker compose up
 ```
 
-### Create Collection falha
+### The API cannot connect to Qdrant
 
 ```bash
-# Verificar logs
-docker-compose --profile init logs create-collection
-
-# Verificar se .env tem GROQ_API_KEY
-cat .env | grep GROQ_API_KEY
-
-# Tentar manualmente
-docker-compose --profile init run --rm create-collection
+docker compose ps
+docker compose logs api
 ```
 
-### Porta 8000 ou 6333 já em uso
+Check that:
+
+- `qdrant` is healthy
+- `QDRANT_API_KEY` matches in both services
+- the API is using `http://qdrant:6333` internally
+
+### Collection initialization fails
 
 ```bash
-# Trocar porta no docker-compose.yml
-# Altere "8000:8000" para "8001:8000" por exemplo
-
-# Ou liberar a porta
-# macOS/Linux:
-lsof -i :8000
-kill -9 <PID>
+docker compose --profile init logs create-collection
+docker compose --profile init run --rm create-collection
 ```
 
-## 📈 Performance Tips
+Also confirm that `.env` contains a valid `GROQ_API_KEY` if the initialization flow depends on model-backed components.
 
-### Usar BuildKit (mais rápido)
+### Port `8000` or `6333` is already in use
 
-```bash
-DOCKER_BUILDKIT=1 docker-compose build
-```
+Either stop the conflicting process or change the host-side port mapping in `docker-compose.yml`.
 
-### Limpar Cache do Docker
+Examples:
 
-```bash
-# Remover imagens não usadas
-docker image prune
+- change `"8000:8000"` to `"8001:8000"`
+- change `"6333:6333"` to `"6335:6333"`
 
-# Remover containers parados
-docker container prune
+## Production Notes
 
-# Limpeza completa (cuidado!)
-docker system prune -a
-```
+This Compose file is primarily suited for local development. Before using it in production, consider:
 
-## 🚀 Deploy
+1. Using a production-ready `.env` with real secrets management
+2. Restricting or removing exposed Qdrant ports if external access is not needed
+3. Running behind a reverse proxy
+4. Adding resource limits and monitoring
+5. Reviewing whether bind mounts should be removed in favor of immutable images
 
-Para deploy em produção, veja as melhores práticas:
+## Setup Checklist
 
-1. Use `.env` com variáveis de produção
-2. Configure QDRANT_URL para instância cloud
-3. Use health checks
-4. Configure resource limits
-5. Use reverse proxy (nginx)
-6. Configure logging centralizado
+- [ ] Docker and Docker Compose are installed
+- [ ] `.env` was created from `.env.docker`
+- [ ] `GROQ_API_KEY` was configured
+- [ ] `docker compose build` completed successfully
+- [ ] `docker compose --profile init up create-collection` completed successfully
+- [ ] `docker compose up` started the API and Qdrant
+- [ ] `http://localhost:8000/docs` is reachable
 
-## 📝 Exemplo Completo de .env para Docker
-
-```env
-# Qdrant Configuration
-QDRANT_API_KEY=sua-chave-super-secreta
-
-# Groq API (necessário)
-GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxxxx
-
-# OpenAI API (opcional)
-OPENAI_API_KEY=sk_xxxxxxxxxxxxx
-
-# Para usar Qdrant Cloud em vez de local:
-# QDRANT_URL=https://xxxxx-xxxxx.us-east-1-0.aws.cloud.qdrant.io
-# QDRANT_API_KEY=xxxxxxxxxxxxxxxx
-```
-
-## ✅ Checklist de Setup
-
-- [ ] Docker e Docker Compose instalados
-- [ ] Groq API Key obtida
-- [ ] .env arquivo criado com credenciais
-- [ ] `docker-compose --profile init up create-collection` executado
-- [ ] API acessível em http://localhost:8000
-- [ ] Swagger docs visível em http://localhost:8000/docs
-- [ ] Primeiro teste de endpoint bem-sucedido
-
----
-
-Para mais informações, veja [README.md](README.md)
+For general project information, see `README.md`.

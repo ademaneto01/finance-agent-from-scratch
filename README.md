@@ -1,28 +1,28 @@
-# 🤖 Finance Agent - Análise de Investimentos Inteligente
+# 🤖 Finance Agent - Intelligent Investment Analysis
 
-Um **agente de inteligência artificial** construído do zero em Python puro para análise de investimentos e pesquisa financeira. Sem dependências como LangChain ou LangGraph — apenas Python, FastAPI, Groq e Qdrant.
+An **artificial intelligence agent** built from scratch in pure Python for investment analysis and financial research. No dependencies like LangChain or LangGraph — just Python, FastAPI, Groq, and Qdrant.
 
-## 📊 Posicionamento da Empresa no Setor de Investimentos
+## 📊 Company Positioning in the Investment Space
 
-Este projeto representa um **sistema de análise financeira de próxima geração** que combina:
+This project represents a **next-generation financial analysis system** that combines:
 
-- **Processamento de Dados Financeiros em Tempo Real**: Integração com EDGAR (SEC Filings) e Yahoo Finance para capturar informações de mercado e relatórios corporativos
-- **Análise Inteligente Baseada em IA**: Processamento de textos financeiros com LLMs de ponta (Groq/Llama) para gerar recomendações de investimento
-- **Busca Semântica Avançada**: Utilização de embeddings multi-vetoriais (dense, sparse, colbert) com Qdrant para encontrar insights relevantes em grandes volumes de dados financeiros
-- **Recomendações Estruturadas**: Geração de análises fundamentalistas, momentum e sentimento com recomendações de ação (BUY/HOLD/SELL)
+- **Real-Time Financial Data Processing**: Integration with EDGAR (SEC Filings) and Yahoo Finance to capture market information and corporate reports
+- **AI-Powered Intelligent Analysis**: Processing of financial text with state-of-the-art LLMs (Groq/Llama) to generate investment recommendations
+- **Advanced Semantic Search**: Multi-vector embeddings (dense, sparse, ColBERT) with Qdrant to find relevant insights in large volumes of financial data
+- **Structured Recommendations**: Generation of fundamental, momentum, and sentiment analyses with action recommendations (BUY/HOLD/SELL)
 
-### Diferenciais Competitivos
+### Competitive Differentiators
 
-✅ **Análise Fundamental Completa**: Extrai pontos fortes e fraquezas de empresas baseado em filings públicas
-✅ **Análise de Momentum**: Avalia tendências de curto prazo baseado em notícias e movimentos de mercado  
-✅ **Análise de Sentimento**: Processa sentimento de mercado a partir de múltiplas fontes de notícias
-✅ **Guardrails Inteligentes**: Valida queries para garantir segurança e relevância das análises
-✅ **Busca Semântica Híbrida**: Combina busca densa, esparsa e colbert para máxima relevância
-✅ **API REST Moderna**: Integração fácil com aplicações front-end e ferramentas externas
+✅ **Full Fundamental Analysis**: Extracts strengths and weaknesses of companies based on public filings  
+✅ **Momentum Analysis**: Evaluates short-term trends based on news and market moves  
+✅ **Sentiment Analysis**: Processes market sentiment from multiple news sources  
+✅ **Smart Guardrails**: Validates queries to ensure safety and relevance of analyses  
+✅ **Hybrid Semantic Search**: Combines dense, sparse, and ColBERT search for maximum relevance  
+✅ **Modern REST API**: Easy integration with front-end applications and external tools  
 
 ---
 
-## 🏗️ Arquitetura do Sistema
+## 🏗️ System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -68,41 +68,41 @@ Este projeto representa um **sistema de análise financeira de próxima geraçã
 
 ---
 
-## 🎯 Funcionalidades Principais
+## 🎯 Main Features
 
-### 1️⃣ **Agent de Análise Financeira** (`POST /agent`)
-Endpoint principal que executa análise completa de um ticker:
+### 1️⃣ **Financial Analysis Agent** (`POST /agent`)
+Main endpoint that runs a full analysis for a ticker:
 
 ```json
 {
-  "query": "Apple é um bom investimento para o longo prazo?",
+  "query": "Is Apple a good long-term investment?",
   "limit": 3
 }
 ```
 
-**Retorna:**
-- Análise Fundamental (nota A-D, teses, forças, fraquezas)
-- Análise de Momentum (força, drivers, outlook)
-- Análise de Sentimento (score, catalistas, outlook)
-- Recomendação Final (BUY/HOLD/SELL com confiança)
+**Returns:**
+- Fundamental Analysis (grade A-D, thesis, strengths, weaknesses)
+- Momentum Analysis (strength, drivers, outlook)
+- Sentiment Analysis (score, catalysts, outlook)
+- Final Recommendation (BUY/HOLD/SELL with confidence)
 
-### 2️⃣ **Busca Semântica** (`POST /search`)
-RAG com busca híbrida multi-vetor em dados financeiros:
+### 2️⃣ **Semantic Search** (`POST /search`)
+RAG with hybrid multi-vector search over financial data:
 
 ```json
 {
-  "query": "Qual foi a receita da Apple em 2023?",
+  "query": "What was Apple's revenue in 2023?",
   "limit": 5
 }
 ```
 
-**Retorna:**
-- Top 5 documentos mais relevantes
-- Scores de similaridade
-- Contexto financeiro extraído
+**Returns:**
+- Top 5 most relevant documents
+- Similarity scores
+- Extracted financial context
 
-### 3️⃣ **Ingestão EDGAR** (`POST /ingestion/edgar`)
-Captura e processa SEC Filings (10-K, 10-Q, 8-K):
+### 3️⃣ **EDGAR Ingestion** (`POST /ingestion/edgar`)
+Fetches and processes SEC Filings (10-K, 10-Q, 8-K):
 
 ```json
 {
@@ -110,8 +110,8 @@ Captura e processa SEC Filings (10-K, 10-Q, 8-K):
 }
 ```
 
-### 4️⃣ **Ingestão Yahoo Finance** (`POST /ingestion/yahoo`)
-Captura notícias e dados de mercado:
+### 4️⃣ **Yahoo Finance Ingestion** (`POST /ingestion/yahoo`)
+Fetches news and market data:
 
 ```json
 {
@@ -121,107 +121,108 @@ Captura notícias e dados de mercado:
 
 ---
 
-## 🚀 Instalação e Setup
+## 🚀 Installation and Setup
 
-### Pré-requisitos
+### Prerequisites
 
 - Python 3.13+
-- UV (gerenciador de pacotes)
-- Conta Groq (LLM gratuito e rápido)
-- Instância Qdrant (na nuvem ou local)
+- UV (package manager)
+- Groq account (free and fast LLM)
+- Qdrant instance (cloud or local)
 
-### 1. Clonar o Repositório
+### 1. Clone the Repository
 
 ```bash
 git clone <repo-url>
 cd finance-agent-from-scratch
 ```
 
-### 2. Instalar Dependências
+### 2. Install Dependencies
 
 ```bash
-# Com UV
+# With UV
 uv sync
+```
 
-### 3. Configurar Variáveis de Ambiente
+### 3. Configure Environment Variables
 
 ```bash
 cp .env.example .env
 ```
 
-Edite `.env` com suas credenciais:
+Edit `.env` with your credentials:
 
 ```env
-# Groq API (obtém em https://console.groq.com)
+# Groq API (get at https://console.groq.com)
 GROQ_API_KEY=gsk_xxxxxxxxxxxxx
 
-# Qdrant (obtém em https://cloud.qdrant.io ou instala localmente)
+# Qdrant (get at https://cloud.qdrant.io or install locally)
 QDRANT_URL=https://xxxxx-xxxxx.us-east-1-0.aws.cloud.qdrant.io
 QDRANT_API_KEY=xxxxxxxxxxxxxxxx
 ```
 
-### 4. **IMPORTANTE: Criar Collection no Qdrant**
+### 4. **IMPORTANT: Create Collection in Qdrant**
 
-Este é um **passo manual obrigatório** que precisa ser feito apenas uma vez.
+This is a **mandatory manual step** that only needs to be done once.
 
-#### Opção A: Executar Script Python
+#### Option A: Run Python Script
 
 ```bash
-# Do diretório raiz do projeto
+# From the project root directory
 python -m api.ingestion.create_collection
 ```
 
-Este script:
-1. Conecta à sua instância Qdrant
-2. Deleta a collection "financial" (se existir)
-3. Recria com configuração otimizada para análise financeira
+This script:
+1. Connects to your Qdrant instance
+2. Deletes the "financial" collection (if it exists)
+3. Recreates it with settings optimized for financial analysis
 
-**✅ Pronto!** Sua collection está criada e pronta para receber dados.
+**✅ Done!** Your collection is created and ready to receive data.
 
-### 5. Iniciar a API
+### 5. Start the API
 
 ```bash
-# Do diretório api/
+# From the api/ directory
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-A API estará disponível em: **http://localhost:8000**
+The API will be available at: **http://localhost:8000**
 
-Documentação interativa (Swagger): **http://localhost:8000/docs**
+Interactive documentation (Swagger): **http://localhost:8000/docs**
 
 ---
 
-## 💻 Exemplos de Uso
+## 💻 Usage Examples
 
-### Exemplo 1: Analisar um Ticker
+### Example 1: Analyze a Ticker
 
 ```bash
 curl -X POST "http://localhost:8000/agent" \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "Apple é um bom investimento?",
+    "query": "Is Apple a good investment?",
     "limit": 3
   }'
 ```
 
-**Resposta:**
+**Response:**
 ```json
 {
-  "query": "Apple é um bom investimento?",
+  "query": "Is Apple a good investment?",
   "ticker": "AAPL",
   "fundamental_analysis": {
-    "overall_investment_thesis": "Apple mantém posição forte no mercado com receita crescente...",
+    "overall_investment_thesis": "Apple maintains a strong market position with growing revenue...",
     "investment_grade": "A",
     "confidence_score": 0.92,
     "key_strengths": [
-      "Ecossistema integrado e brand loyalty",
-      "Margem operacional saudável",
-      "Caixa e posição financeira forte"
+      "Integrated ecosystem and brand loyalty",
+      "Healthy operating margin",
+      "Strong cash position and balance sheet"
     ],
     "key_concerns": [
-      "Dependência de mercado chinês",
-      "Saturação do mercado de smartphones",
-      "Pressão regulatória crescente"
+      "Dependence on the Chinese market",
+      "Smartphone market saturation",
+      "Increasing regulatory pressure"
     ],
     "recommendation": "buy"
   },
@@ -229,12 +230,12 @@ curl -X POST "http://localhost:8000/agent" \
     "overall_momentum": "positive",
     "momentum_strength": "strong",
     "key_momentum_drivers": [
-      "Crescimento em serviços",
-      "Demanda por AI features"
+      "Services growth",
+      "Demand for AI features"
     ],
     "momentum_risks": [
-      "Volatilidade macro",
-      "Pressão em preços"
+      "Macro volatility",
+      "Pricing pressure"
     ],
     "short_term_outlook": "bullish",
     "momentum_score": 7.5
@@ -243,48 +244,48 @@ curl -X POST "http://localhost:8000/agent" \
     "sentiment_score": 8.2,
     "sentiment_direction": "Positive",
     "key_news_themes": [
-      "Novo lançamento de produtos",
-      "Expansão AI",
-      "Crescimento de receita"
+      "New product launches",
+      "AI expansion",
+      "Revenue growth"
     ],
     "recent_catalysts": [
       "WWDC 2024",
-      "Earnings Q1 positivos",
-      "Parceria com OpenAI"
+      "Positive Q1 earnings",
+      "Partnership with OpenAI"
     ],
-    "market_outlook": "Confiança elevada no crescimento futuro"
+    "market_outlook": "High confidence in future growth"
   },
   "final_recommendation": {
     "action": "BUY",
     "confidence": 0.89,
-    "rationale": "Apple apresenta fundamentos sólidos, momentum positivo e sentimento de mercado favorável...",
+    "rationale": "Apple shows solid fundamentals, positive momentum, and favorable market sentiment...",
     "key_risks": [
-      "Recessão econômica",
-      "Pressão regulatória China",
-      "Competição Android"
+      "Economic recession",
+      "Regulatory pressure in China",
+      "Android competition"
     ],
     "key_opportunities": [
-      "Expansão em IA",
-      "Crescimento de serviços",
-      "Novos mercados"
+      "Expansion in AI",
+      "Services growth",
+      "New markets"
     ],
     "time_horizon": "Long-term"
   }
 }
 ```
 
-### Exemplo 2: Buscar Informações Financeiras
+### Example 2: Search Financial Information
 
 ```bash
 curl -X POST "http://localhost:8000/search" \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "Qual foi a receita de Apple em 2023?",
+    "query": "What was Apple's revenue in 2023?",
     "limit": 5
   }'
 ```
 
-### Exemplo 3: Ingerir Dados EDGAR
+### Example 3: Ingest EDGAR Data
 
 ```bash
 curl -X POST "http://localhost:8000/ingestion/edgar" \
@@ -296,18 +297,18 @@ curl -X POST "http://localhost:8000/ingestion/edgar" \
 
 ---
 
-## 📁 Estrutura do Projeto
+## 📁 Project Structure
 
 ```
 finance-agent-from-scratch/
 ├── api/
 │   ├── main.py                          # FastAPI app
-│   ├── routers/                         # Endpoints da API
+│   ├── routers/                         # API endpoints
 │   │   ├── agent.py                     # Agent analysis endpoint
 │   │   ├── search.py                    # Search endpoint
 │   │   ├── ingestion_edgar.py           # EDGAR ingestion endpoint
 │   │   └── ingestion_yahoo.py           # Yahoo ingestion endpoint
-│   ├── services/                        # Lógica de negócio
+│   ├── services/                        # Business logic
 │   │   ├── agent.py                     # Agent service
 │   │   ├── search.py                    # Search service
 │   │   ├── rag.py                       # RAG service
@@ -339,30 +340,30 @@ finance-agent-from-scratch/
 │       └── prompts.py                   # LLM prompts
 ├── .env.example                         # Environment template
 ├── pyproject.toml                       # Project metadata
-└── README.md                            # Este arquivo
+└── README.md                            # This file
 ```
 
 ---
 
-## 🔧 Configuração Avançada
+## 🔧 Advanced Configuration
 
-### Modelos Disponíveis
+### Available Models
 
-**Modelos de Embedding:**
-- `sentence-transformers/all-MiniLM-L6-v2` (padrão, rápido, 384 dims)
-- `sentence-transformers/all-mpnet-base-v2` (melhor qualidade, 768 dims)
+**Embedding models:**
+- `sentence-transformers/all-MiniLM-L6-v2` (default, fast, 384 dims)
+- `sentence-transformers/all-mpnet-base-v2` (better quality, 768 dims)
 
-**Modelos LLM (Groq):**
-- `llama-3.1-8b-instant` (padrão)
+**LLM models (Groq):**
+- `llama-3.1-8b-instant` (default)
 - `mixtral-8x7b-32768`
 - `gemma-7b-it`
 
-**Modelos ColBERT:**
-- `colbert-ir/colbertv2.0` (padrão)
+**ColBERT models:**
+- `colbert-ir/colbertv2.0` (default)
 
-### Customizar Settings
+### Customize Settings
 
-Edite `api/config/settings.py`:
+Edit `api/config/settings.py`:
 
 ```python
 class Settings(BaseSettings):
@@ -378,37 +379,37 @@ class Settings(BaseSettings):
 
 ---
 
-## 🔒 Segurança e Guardrails
+## 🔒 Security and Guardrails
 
-O sistema inclui validação de queries para garantir segurança:
+The system includes query validation for safety:
 
 ```python
-# Validação automática de queries
+# Automatic query validation
 guardrails_service.validate_query(
-    query="Qual é o melhor investimento em tech?",
+    query="What is the best tech investment?",
     tickers=["AAPL", "MSFT", "GOOGL"]
 )
 ```
 
-**Validações incluídas:**
-- ✅ Detecção de prompts injections
-- ✅ Validação de tickers
-- ✅ Verificação de contexto financeiro
-- ✅ Sanitização de inputs
+**Validations included:**
+- ✅ Prompt injection detection
+- ✅ Ticker validation
+- ✅ Financial context checks
+- ✅ Input sanitization
 
 ---
 
-## 📊 Performance e Escalabilidade
+## 📊 Performance and Scalability
 
-### Busca Hybrid (3 tipos de vetores)
+### Hybrid Search (3 vector types)
 
-| Tipo | Propósito | Performance |
-|------|-----------|------------|
-| **Dense** | Semântica geral | ⚡ Rápido |
-| **Sparse** | Busca exata de termos | ⚡⚡ Muito rápido |
-| **ColBERT** | Relevância máxima | ⚡⚡⚡ Mais preciso |
+| Type | Purpose | Performance |
+|------|---------|-------------|
+| **Dense** | General semantics | ⚡ Fast |
+| **Sparse** | Exact term search | ⚡⚡ Very fast |
+| **ColBERT** | Maximum relevance | ⚡⚡⚡ Most accurate |
 
-### Chunking Inteligente
+### Smart Chunking
 
-- **Semantic Chunker**: Divide por tópicos relevantes
-- **Simple Chunker**: Divide por tamanho fixo
+- **Semantic Chunker**: Splits by relevant topics
+- **Simple Chunker**: Splits by fixed size
