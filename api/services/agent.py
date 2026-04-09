@@ -82,7 +82,7 @@ class AgentService:
 
         # ticker = self.guardrails.validate_ticker(ticker)
 
-        ticker = self.ticker_extractor.extract_ticker(validated_query)
+        ticker = self.ticker_extractor.extract_ticker(query)
 
         fundamental_task = self._analyze_fundamental(ticker, limit)
         momentum_task = self._analyze_momentum(ticker, limit)
