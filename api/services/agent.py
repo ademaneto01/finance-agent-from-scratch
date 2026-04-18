@@ -29,7 +29,7 @@ class AgentService:
     def __init__(self, search_service: SearchService):
         self.search_service = search_service
         client = AsyncGroq(api_key=settings.groq_api_key)
-        self.client = instructor.from_groq(client, model=instructor.Mode.JSON)
+        self.client = instructor.from_groq(client, mode=instructor.Mode.JSON)
         self.ticker_extractor = TickerExtractor()
         # self.guardrails = GuardrailsService()
 
@@ -83,6 +83,19 @@ class AgentService:
         # ticker = self.guardrails.validate_ticker(ticker)
 
         ticker = self.ticker_extractor.extract_ticker(query)
+
+        if ticker == "NONE":
+            raise ValueError(
+                "No momento nao conseguimos identificar a empresa da sua pergunta. Tente informar o ticker ou o nome da empresa."
+            )
+
+        fundamental_filter = {"ticker": ticker, "form_type": "10-K"}
+        fundamental_context = self._run_queries(FUNDAMENTAL_QUERIES, limit, fundamental_filter)
+        
+        if not fundamental_context.strip():
+            raise ValueError(
+                f"No momento ainda nao temos dados suficientes da empresa {ticker} na nossa base para gerar essa analise. Estamos trabalhando para ampliar a cobertura em breve."
+            )
 
         fundamental_task = self._analyze_fundamental(ticker, limit)
         momentum_task = self._analyze_momentum(ticker, limit)

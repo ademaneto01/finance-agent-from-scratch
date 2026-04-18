@@ -1,5 +1,5 @@
 from config.settings import settings
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from models.search import SearchRequest, SearchResponse
 from services.search import SearchService
 
@@ -14,8 +14,11 @@ search_service = SearchService(
 
 @router.post("/search", response_model=SearchResponse)
 def search(request: SearchRequest):
-    return search_service.search(
-        request.query,
-        request.limit,
-        request.filter,
-    )
+    try:
+        return search_service.search(
+            request.query,
+            request.limit,
+            request.filter,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

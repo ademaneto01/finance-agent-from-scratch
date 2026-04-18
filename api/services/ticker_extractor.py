@@ -7,8 +7,8 @@ from pydantic import BaseModel, Field
 
 class TickerResult(BaseModel):
     ticker: str = Field(
-        pattern="^[A-Z]{1,5}$",
-        description="Stock ticker symbol (1-5 uppercase letters)",
+        pattern="^(NONE|[A-Z]{1,5})$",
+        description='Stock ticker symbol (1-5 uppercase letters) or "NONE"',
     )
 
 
@@ -35,4 +35,5 @@ class TickerExtractor:
             temperature=0,
             response_model=TickerResult,
         )
+        print(f"Result: {result}")
         return result.ticker
