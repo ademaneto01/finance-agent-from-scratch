@@ -35,5 +35,5 @@ class TickerExtractor:
             temperature=0,
             response_model=TickerResult,
         )
-        print(f"Result: {result}")
+
         return result.ticker
