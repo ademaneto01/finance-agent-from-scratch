@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     colbert_model: str = "colbert-ir/colbertv2.0"
     groq_api_key: str
     groq_model: str = "llama-3.1-8b-instant"
+    database_url: str = (
+        "postgresql+psycopg://finance:finance@postgres:5432/finance"
+    )
+    runner_timezone: str = "UTC"
 
 
 settings = Settings()

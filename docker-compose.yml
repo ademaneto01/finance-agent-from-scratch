@@ -1,6 +1,27 @@
 version: '3.8'
 
 services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: finance-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-finance}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-finance}
+      POSTGRES_DB: ${POSTGRES_DB:-finance}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_storage:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-finance} -d ${POSTGRES_DB:-finance}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - finance-network
+
   # Qdrant Vector Database
   qdrant:
     image: qdrant/qdrant:latest
@@ -63,8 +84,12 @@ services:
       GROQ_API_KEY: ${GROQ_API_KEY:-}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       GUARDRAILS_TOKEN: ${GUARDRAILS_TOKEN}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://finance:finance@postgres:5432/finance}
+      RUNNER_TIMEZONE: ${RUNNER_TIMEZONE:-UTC}
     depends_on:
       qdrant:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
     volumes:
       - .:/app
@@ -72,8 +97,37 @@ services:
     networks:
       - finance-network
 
+  # Daily ticker ingestion runner
+  runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: finance-runner
+    working_dir: /app/api
+    environment:
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_API_KEY: ${QDRANT_API_KEY:-qdrant-api-key}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://finance:finance@postgres:5432/finance}
+      RUNNER_TIMEZONE: ${RUNNER_TIMEZONE:-UTC}
+    depends_on:
+      qdrant:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/.venv
+    command: uv run python runner.py
+    restart: unless-stopped
+    networks:
+      - finance-network
+
 volumes:
   qdrant_storage:
+    driver: local
+  postgres_storage:
     driver: local
 
 networks:

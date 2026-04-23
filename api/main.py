@@ -1,8 +1,27 @@
+from contextlib import asynccontextmanager
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import ingestion_yahoo, ingestion_edgar, search, agent
+from routers import search, agent
 
-app = FastAPI(title="Financial Search API")
+from database.connection import Base, engine
+import database.models  # noqa: F401  (ensure models are registered on Base)
+
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    try:
+        Base.metadata.create_all(engine)
+        logger.info("Database tables verified/created")
+    except Exception as exc:
+        logger.error(f"Failed to create database tables: {exc}")
+    yield
+
+
+app = FastAPI(title="Financial Search API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -14,8 +33,6 @@ app.add_middleware(
 
 app.include_router(search.router)
 app.include_router(agent.router)
-app.include_router(ingestion_yahoo.router)
-app.include_router(ingestion_edgar.router)
 
 
 @app.get("/")

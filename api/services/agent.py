@@ -89,13 +89,14 @@ class AgentService:
                 "No momento nao conseguimos identificar a empresa da sua pergunta. Tente informar o ticker ou o nome da empresa."
             )
 
+        if not self.search_service._ticker_has_points(ticker):
+            self.search_service.ticker_queue_service.enqueue(ticker)
+            raise ValueError(
+                f"Ticker {ticker} ainda nao indexado. Foi adicionado a fila e sera processado no proximo ciclo diario."
+            )
+            
         fundamental_filter = {"ticker": ticker, "form_type": "10-K"}
         fundamental_context = self._run_queries(FUNDAMENTAL_QUERIES, limit, fundamental_filter)
-        
-        if not fundamental_context.strip():
-            raise ValueError(
-                f"No momento ainda nao temos dados suficientes da empresa {ticker} na nossa base para gerar essa analise. Estamos trabalhando para ampliar a cobertura em breve."
-            )
 
         fundamental_task = self._analyze_fundamental(ticker, limit)
         momentum_task = self._analyze_momentum(ticker, limit)
